@@ -29,11 +29,11 @@ let currentSelectedMode = "ALL";
 let slots = [];             
 let wordBlocks = []; 
 
-// 🎯 単語10問・熟語10問・並べ替え10問（合計30問）のクイズデータ
+// 🎯 クイズデータ
 const quizData = [
     // === STAGE 1: 単語部門 (10問) ===
     { id: 1,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "queen"（beauty queen）の、この曲の文脈における正しい意味はどれ？', choices: ['本物の女王（王室の女性）', 'トランプの「Q」のカード', '（ミスコンなどの）女王、美女', '母親、年上の女性'], answer: '（ミスコンなどの）女王、美女', explanation: 'スライド4に登場する "beauty queen" は「（映画のワンシーンに出てくるような）美女」を意味する単語です。' },
-    { id: 2,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "scene"（movie scene）の正しい意味はどれ？', choices: ['（映画などの）シーン、場面', 'カメラのレンズ', '映画館の座席', 'セリフ、台本'], answer: '（映画などの）シーン、場面', explanation: 'スライド4の語彙タグ通り、"movie scene" で「映画のワンシーン（場面）」という意味になります。' },
+    { id: 2,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "scene"（movie scene）の正しい意味はどれ？', choices: ['（映画などの）シーン、場面', 'カメラのレンズ', '映画館の座席', 'セリフ、台本'], answer: '（映画などの）シーン、場面', explanation: 'スライド4の語彙タグ通り、"movie scene" で「映画のワンシーン（場面環境）」という意味になります。' },
     { id: 3,  stage: 1, type: 'choice', audioKey: 'music11', instruction: '【単語】歌詞に出てくる動詞 "claim"（She\'s just a girl who claims...）の正しい意味はどれ？', choices: ['～を優しく褒める', '（根拠がないのに）～だと主張する、言い張る', '静かに諦める', '友達に紹介する'], answer: '（根拠がないのに）～だと主張する、言い張る', explanation: 'スライド14の語彙タグに「claim：〜だと主張する、言い張る」と記載されており、根拠のない主張というニュアンスが含まれます。' },
     { id: 4,  stage: 1, type: 'choice', audioKey: 'music10', instruction: '【単語】歌詞に出てくる "lover"（Billie Jean is not my lover）の正しい意味はどれ？', choices: ['親友', 'ファン', '恋人', '仕事のパートナー'], answer: '恋人', explanation: 'スライド13に記載の通り、"lover" は「恋人」を意味し、マイケルが彼女との交際関係を否定している重要な単語です。' },
     { id: 5,  stage: 1, type: 'choice', audioKey: 'music12', instruction: '【単語】スライド15の解説にある、一般的な「子供」を指す客観的な単語はどれ？', choices: ['son', 'kid', 'girl', 'baby'], answer: 'kid', explanation: 'スライド15に「Kidは一般的な『子供』という客観的な言葉」と解説されています。' },
@@ -98,8 +98,13 @@ let currentActiveVoice = null;
 
 const blockColors = [0xFF3333, 0xFFCC00, 0x33CCFF, 0x9933FF]; 
 
+// 🎉 正解時のシャウト音声リスト
 const correctSoundsList = ['shout_howl', 'shout_dah', 'shout_aaow', 'shout_hee', 'shout_snore', 'shout_lose'];
 let correctSoundIndex = 0;
+
+// ❌ 不正解時の音声リスト（交代交代で再生する4つのサウンド）
+const wrongSoundsList = ['hahaha_zan', 'atatata', 'kuririn', 'your_blood'];
+let wrongSoundIndex = 0;
 
 const QWERTY_ROWS = [
     ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
@@ -121,8 +126,8 @@ function preload() {
     this.load.image('buzz_mad1', 'assets/buzz-mad1.png');
     this.load.image('buzz_mad2', 'assets/buzz-mad2.png');
     
-    // 🎵 常時流すBGMの読み込み
-    this.load.audio('bgm_intro', 'sounds/intro.mp3');
+    // 🎵 常時ループ再生用BGM（uji-ueda.mp3に変更）
+    this.load.audio('bgm_intro', 'sounds/uji-ueda.mp3');
 
     for(let i = 1; i <= 13; i++) {
         this.load.audio(`music${i}`, `sounds/${i}.mp3`);
@@ -133,7 +138,12 @@ function preload() {
     this.load.audio('shout_hee', 'sounds/michael-hee-hee.mp3');
     this.load.audio('shout_snore', 'sounds/snore.mp3');
     this.load.audio('shout_lose', 'sounds/lose-voice.mp3'); 
-    this.load.audio('shout_haha', 'sounds/hahaha-zan.mp3'); 
+    
+    // ❌ 不正解時の新音声群
+    this.load.audio('hahaha_zan', 'sounds/hahaha-zan.mp3'); 
+    this.load.audio('atatata', 'sounds/atatata.mp3'); 
+    this.load.audio('kuririn', 'sounds/kuririn.mp3'); 
+    this.load.audio('your_blood', 'sounds/your-blood.mp3'); 
 }
 
 function create() {
@@ -145,7 +155,7 @@ function create() {
     bg.setDisplaySize(1024, 768);
     extraBuzzGroup = this.add.group(); 
     
-    // 🎵 常時ループ再生用BGMの初期化
+    // 🎵 BGM初期化
     if (!bgmSound) {
         bgmSound = this.sound.add('bgm_intro', { loop: true, volume: 0.4 });
     }
@@ -332,7 +342,6 @@ function showHTMLForm() {
 
         formDiv.remove();
         
-        // 🔊 ゲーム開始時にBGMを再生（すでに流れていなければ）
         if (bgmSound && !bgmSound.isPlaying) {
             bgmSound.play();
         }
@@ -371,7 +380,6 @@ function initGame() {
             if(timerEvent) timerEvent.remove();
             extraBuzzGroup.clear(true, true);
             
-            // 🔊 音声を綺麗に全停止
             if(currentActiveVoice) { currentActiveVoice.stop(); currentActiveVoice = null; }
             this.sound.stopAll();
             bgmSound = null;
@@ -421,7 +429,6 @@ function startQuestion() {
     uiContainer.removeAll(true);
     instructionText.setVisible(true);
     
-    // 🔊 次の問題へ進む際、前の問題のリスニング音声が鳴っていたら停止してBGMを戻す
     if (currentActiveVoice && currentActiveVoice.isPlaying) {
         currentActiveVoice.stop();
         currentActiveVoice = null;
@@ -468,6 +475,7 @@ function updateTimer() {
     }
 }
 
+// ❌ 不正解の時の演出（音声を交代交代で再生 / 表情をmadとcryに変更）
 function triggerDamageEffect() {
     if (currentQuestionState === "DAMAGE" || currentQuestionState === "EXPLANATION") return; 
     currentQuestionState = "DAMAGE";
@@ -475,16 +483,22 @@ function triggerDamageEffect() {
     
     if(timerEvent) timerEvent.remove();
     
-    // 🔊 不正解演出時：BGMおよび再生中のリスニング音声を一時停止
     if (bgmSound && bgmSound.isPlaying) bgmSound.pause();
     if (currentActiveVoice && currentActiveVoice.isPlaying) { currentActiveVoice.stop(); currentActiveVoice = null; }
     
-    this.sound.play('shout_haha'); 
+    // 🔊 交代交代でボイスを再生
+    let wrongSoundKey = wrongSoundsList[wrongSoundsIndex];
+    this.sound.play(wrongSoundKey); 
+    wrongSoundsIndex = (wrongSoundsIndex + 1) % wrongSoundsList.length; // 次のためにインデックスを1進める
+
     this.cameras.main.flash(200, 255, 0, 0, 0.5);
 
     if (buzzMonster) {
         this.tweens.killTweensOf(buzzMonster);
-        startBuzzFlapping.call(this, buzzMonster, 'buzz_mad');
+        
+        // 👾 不正解の時は buzz_mad と buzz_cry を交互に切り替え
+        let wrongFace = (wrongSoundsIndex % 2 === 0) ? 'buzz_mad' : 'buzz_cry';
+        startBuzzFlapping.call(this, buzzMonster, wrongFace);
         buzzMonster.setDepth(100); 
 
         this.tweens.add({
@@ -507,6 +521,7 @@ function triggerDamageEffect() {
     }
 }
 
+// 🎉 正解の時の演出（表情をbuzz-happyに変更）
 function handleCorrectAnswer(q) {
     if (currentQuestionState !== "PLAYING") return;
     currentQuestionState = "CORRECT";
@@ -514,7 +529,6 @@ function handleCorrectAnswer(q) {
     
     if(timerEvent) timerEvent.remove();
     
-    // 🔊 正解演出時：BGMおよび再生中のリスニング音声を一時停止
     if (bgmSound && bgmSound.isPlaying) bgmSound.pause();
     if (currentActiveVoice && currentActiveVoice.isPlaying) { currentActiveVoice.stop(); currentActiveVoice = null; }
 
@@ -543,7 +557,9 @@ function handleCorrectAnswer(q) {
 
     if (buzzMonster) {
         this.tweens.killTweensOf(buzzMonster);
-        startBuzzFlapping.call(this, buzzMonster, 'buzz_cry');
+        
+        // 👾 正解した時は表情を buzz_happy に変更
+        startBuzzFlapping.call(this, buzzMonster, 'buzz_happy');
         buzzMonster.setDepth(100); 
 
         this.tweens.add({
@@ -631,7 +647,6 @@ function checkDragAnswer(q) {
     }
 }
 
-// 🔊 【音響制御のコア】音声ボタンが押された時の処理
 function addAudioHintButton(scene, q, yPos) {
     let hintBtn = scene.add.text(512, yPos, '🎵 LISTEN HINT (音声再生) 🎵', {
         font: 'bold 14px "Press Start 2P"', fill: '#ffff00', backgroundColor: '#332200', padding: { x: 15, y: 8 }
@@ -640,21 +655,17 @@ function addAudioHintButton(scene, q, yPos) {
     hintBtn.on('pointerdown', () => {
         if (isEvaluating) return;
         
-        // 1. すでに他の音声が流れていたらストップさせる
         if (currentActiveVoice && currentActiveVoice.isPlaying) {
             currentActiveVoice.stop();
         }
 
-        // 2. 音声再生中は常時BGM（intro.mp3）を一時停止
         if (bgmSound && bgmSound.isPlaying) {
             bgmSound.pause();
         }
 
-        // 3. 指定されたリスニング音声（1.mp3など）を再生
         currentActiveVoice = scene.sound.add(q.audioKey, { volume: 1.0 });
         currentActiveVoice.play();
 
-        // 4. 音声の再生が終了したら、自動的にBGM（intro.mp3）を再開する
         currentActiveVoice.on('complete', () => {
             if (bgmSound && bgmSound.isPaused && currentQuestionState === "PLAYING") {
                 bgmSound.resume();
@@ -893,7 +904,6 @@ function showExplanation(isCorrect) {
             this.nextInputGuard = true;
             this.time.delayedCall(100, () => { this.nextInputGuard = false; });
             
-            // 🔊 解説を閉じて次の問題に行くタイミングで、一時停止していたBGMを再開
             if (bgmSound && bgmSound.isPaused) {
                 bgmSound.resume();
             }
@@ -908,7 +918,6 @@ function showExplanation(isCorrect) {
         
         const proceedToRetry = () => {
             if (currentExpContainer) { currentExpContainer.destroy(); currentExpContainer = null; }
-            // 🔊 解き直す際も、一時停止していたBGMを再開
             if (bgmSound && bgmSound.isPaused) {
                 bgmSound.resume();
             }
@@ -960,7 +969,6 @@ function showResultScreen() {
     else statusText.setText("復習完了 (再送信なし)");
     
     if (finalScore >= 80) {
-        // 🔊 リザルトでの歓声時もBGMを一時停止
         if (bgmSound && bgmSound.isPlaying) bgmSound.pause();
         this.sound.play('shout_howl'); 
 
