@@ -896,9 +896,18 @@ function showExplanation(isCorrect) {
         font: 'bold 18px monospace', fill: '#0000ff', wordWrap: { width: 760 }, align: 'left'
     }).setOrigin(0, 0.5);
     
-    let expTxt = this.add.text(-380, 50, `【解説】\n${q.explanation}`, { 
-        font: '15px monospace', fill: '#333333', wordWrap: { width: 760 }, align: 'left', lineSpacing: 4
-    }).setOrigin(0, 0.5);
+    // === 【修正】解説テキストの自動折り返し設定 ===
+let expTxt = this.add.text(-380, 50, `【解説】\n${q.explanation}`, { 
+    font: '16px "Courier New", monospace', 
+    fill: '#333333', 
+    align: 'left', 
+    lineSpacing: 6,
+    // 💡 wordWrapを設定することで、枠の幅（760ピクセル）に合わせて自動で改行されます
+    wordWrap: { 
+        width: 760, 
+        useAdvancedWrap: true // 👈 これを入れることで日本語（全角）も綺麗に折り返せるようになります
+    }
+}).setOrigin(0, 0.5);
     
     currentExpContainer.add([qText, aText, expTxt]);
     
