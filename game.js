@@ -19,7 +19,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-// 🔗 スプレッドシートの送信先URL（更新済み）
+// 🔗 スプレッドシートの送信先URL
 const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxgNghXggq3-SR55S5Aki9RBi_5eXSORGebfdVwRbbimRKwa9duFQ8FnyMrJ_km5Q4S/exec";
 
 let studentInfo = { grade: 1, class: 'A', number: 1, name: '' };
@@ -32,14 +32,14 @@ let wordBlocks = [];
 // 🎯 クイズデータ
 const quizData = [
     // === STAGE 1: 単語部門 (10問) ===
-    { id: 1,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "queen"（beauty queen）の、この曲の文脈における正しい意味はどれ？', choices: ['本物の女王（王室の女性）', 'トランプの「Q」のカード', '（ミスコンなどの）女王、美女', '母親、年上の女性'], answer: '（ミスコンなどの）女王、美女', explanation: 'スライド4に登場する "beauty queen" は「（映画のワンシーンに出てくるような）美女」を意味する単語です。' },
-    { id: 2,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "scene"（movie scene）の正しい意味はどれ？', choices: ['（映画などの）シーン、場面', 'カメラのレンズ', '映画館 of 座席', 'セリフ、台本'], answer: '（映画などの）シーン、場面', explanation: 'スライド4の語彙タグ通り、"movie scene" で「映画のワンシーン（場面環境）」という意味になります。' },
+    { id: 1,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "queen"（beauty queen）の、この曲の文脈における正しい意味はどれ？', choices: ['本物の女王（王室の女性）', 'トランプの「Q」のカード', '（ミスコンなどの）女王、美女', '母親、年上の女性'], answer: '（ミスコンなどの）女王、美女', explanation: 'スライド4に登場する "beauty queen" は「（映画 of ワンシーンに出てくるような）美女」を意味する単語です。' },
+    { id: 2,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "scene"（movie scene）の正しい意味はどれ？', choices: ['（映画などの）シーン、場面', 'カメラのレンズ', '映画館の座席', 'セリフ、台本'], answer: '（映画などの）シーン、場面', explanation: 'スライド4の語彙タグ通り、"movie scene" で「映画のワンシーン（場面環境）」という意味になります。' },
     { id: 3,  stage: 1, type: 'choice', audioKey: 'music11', instruction: '【単語】歌詞に出てくる動詞 "claim"（She\'s just a girl who claims...）の正しい意味はどれ？', choices: ['～を優しく褒める', '（根拠がないのに）～だと主張する、言い張る', '静かに諦める', '友達に紹介する'], answer: '（根拠がないのに）～だと主張する、言い張る', explanation: 'スライド14の語彙タグに「claim：〜だと主張する、言い張る」と記載されており、根拠のない主張というニュアンスが含まれます。' },
     { id: 4,  stage: 1, type: 'choice', audioKey: 'music10', instruction: '【単語】歌詞に出てくる "lover"（Billie Jean is not my lover）の正しい意味はどれ？', choices: ['親友', 'ファン', '恋人', '仕事のパートナー'], answer: '恋人', explanation: 'スライド13に記載の通り、"lover" は「恋人」を意味し、マイケルが彼女との交際関係を否定している重要な単語です。' },
     { id: 5,  stage: 1, type: 'choice', audioKey: 'music12', instruction: '【単語】スライド15の解説にある、一般的な「子供」を指す客観的な単語はどれ？', choices: ['son', 'kid', 'girl', 'baby'], answer: 'kid', explanation: 'スライド15に「Kidは一般的な『子供』という客観的な言葉」と解説されています。' },
     { id: 6,  stage: 1, type: 'choice', audioKey: 'music12', instruction: '【単語】スライド15の解説にある、血縁関係を表す「自分の息子」という意味の強い単語はどれ？', choices: ['kid', 'son', 'boy', 'friend'], answer: 'son', explanation: 'スライド15に「Sonは『自分の息子』という血縁を表す強い言葉」と解説されています。' },
     { id: 7,  stage: 1, type: 'choice', audioKey: 'music9',  instruction: '【単語】歌詞に出てくる "lie"（\'Cause the lie becomes the truth）の正しい意味はどれ？', choices: ['嘘（うそ）', '秘密', '噂（うわさ）', '約束'], answer: '嘘（うそ）', explanation: 'スライド12の語彙タグにある通り、"lie" は「嘘」を意味する名詞です。' },
-    { id: 8,  stage: 1, type: 'choice', audioKey: 'music9',  instruction: '【単語】歌詞に出てくる "truth"（\'Cause the lie becomes the truth）の正しい意味はどれ？', choices: ['言い訳', '真実、事実', '過去', '未来'], answer: '真実、事実', explanation: 'スライド12の語彙タグにある通り、"truth" は「真実、事実」を意味する名詞です。' },
+    { id: 8,  stage: 1, type: 'choice', audioKey: 'music9',  instruction: '【単語】歌詞に出てくる "truth"（\'Cause the lie becomes the truth）の正しい意味はどれ？', choices: ['言い訳', '真真実、事実', '過去', '未来'], answer: '真実、事実', explanation: 'スライド12の語彙タグにある通り、"truth" は「真実、事実」を意味する名詞です。' },
     { id: 9,  stage: 1, type: 'choice', audioKey: 'music6',  instruction: '【単語】歌詞の "Be careful of what you do" に出てくる "careful" の正しい意味はどれ？', choices: ['注意深い、気をつける', '楽しそうな、陽気な', '怒りっぽい、不機嫌な', '退屈な、つまらない'], answer: '注意深い、気をつける', explanation: 'スライド9の解説の通り、"careful" は「注意深い、気をつける」という意味の形容詞です。' },
     { id: 10, stage: 1, type: 'choice', audioKey: 'music7',  instruction: '【単語】歌詞に出てくる "heart"（breakin\' young girls\' hearts）の、この文脈における正しい意味（比喩）はどれ？', choices: ['心臓、脈拍', '心、気持ち、愛情', '体調、健康', '記憶、思い出'], answer: '心、気持ち、愛情', explanation: 'スライド10に登場する "heart" は、単なる心臓ではなく、女の子たちの「心・気持ち」を指しています。' },
 
@@ -57,7 +57,7 @@ const quizData = [
 
     // === STAGE 3: 並べ替え部門 (10問) ===
     { id: 21, stage: 3, type: 'drag',   audioKey: 'music6',  instruction: '【並べ替え】スライド9：歌詞「自分の行動には気をつけなさい」', words: ['WHAT', 'CAREFUL', 'DO', 'OF', 'BE', 'YOU'], answer: ['BE', 'CAREFUL', 'OF', 'WHAT', 'YOU', 'DO'], explanation: 'Be careful of what you do となります。' },
-    { id: 22, stage: 3, type: 'drag',   audioKey: 'music11', instruction: '【並べ替え】スライド14：歌詞「彼女はただ、僕がパパだと言い張っているだけの女の子んだ」', words: ['THAT', 'WHO', 'A GIRL', 'SHE\'S', 'CLAIMS', 'JUST', 'I AM THE ONE'], answer: ['SHE\'S', 'JUST', 'A GIRL', 'WHO', 'CLAIMS', 'THAT', 'I AM THE ONE'], explanation: 'She\'s just a girl who claims that I am the one となります。' },
+    { id: 22, stage: 3, type: 'drag',   audioKey: 'music11', instruction: '【並べ替え】スライド14：歌詞「彼女はただ、僕がパパだと言い張っているだけの女の子なんだ」', words: ['THAT', 'WHO', 'A GIRL', 'SHE\'S', 'CLAIMS', 'JUST', 'I AM THE ONE'], answer: ['SHE\'S', 'JUST', 'A GIRL', 'WHO', 'CLAIMS', 'THAT', 'I AM THE ONE'], explanation: 'She\'s just a girl who claims that I am the one となります。' },
     { id: 23, stage: 3, type: 'drag',   audioKey: 'music1',  instruction: '【並べ替え】スライド4：歌詞「彼女は映画のワンシーンに出てくる美女のようだった」', words: ['MORE', 'QUEEN', 'MOVIE', 'LIKE', 'A BEAUTY', 'SHE', 'FROM A', 'WAS', 'SCENE'], answer: ['SHE', 'WAS', 'MORE', 'LIKE', 'A BEAUTY', 'QUEEN', 'FROM A', 'MOVIE', 'SCENE'], explanation: 'She was more like a beauty queen from a movie scene となります。' },
     { id: 24, stage: 3, type: 'drag',   audioKey: 'music3',  instruction: '【並べ替え】スライド6：歌詞「円形のフロアで踊る主役（男）」となるように [ the one ] に続く形を完成させよう。', words: ['FLOOR', 'WILL', 'ON', 'WHO', 'DANCE', 'THE', 'IN THE ROUND'], answer: ['WHO', 'WILL', 'DANCE', 'ON', 'THE', 'FLOOR', 'IN THE ROUND'], explanation: '...the one who will dance on the floor in the round となります。' },
     { id: 25, stage: 3, type: 'drag',   audioKey: 'music10', instruction: '【並べ替え】スライド13：歌詞「ビリー・ジーンは僕の恋人じゃない」', words: ['LOVER', 'IS', 'MY', 'BILLIE JEAN', 'NOT'], answer: ['BILLIE JEAN', 'IS', 'NOT', 'MY', 'LOVER'], explanation: 'Billie Jean is not my lover となります。' },
@@ -885,17 +885,23 @@ function showExplanation(isCorrect) {
     let resultLabel = this.add.text(0, -170, isCorrect ? "⭕ CORRECT!" : "❌ WRONG...", { font: 'bold 28px "Press Start 2P"', fill: resColor }).setOrigin(0.5);
     currentExpContainer.add(resultLabel);
     
-    // ⭕ 問題文テキストの幅調整（枠からはみ出さないようにラップ幅を760に設定）
-    let qText = this.add.text(0, -110, `問題: ${q.instruction.replace('【単語】','').replace('【熟語・表現】','')}`, { font: 'bold 15px monospace', fill: '#000000', wordWrap: { width: 760 }, align: 'center' }).setOrigin(0.5);
-    let aText = this.add.text(0, -40, `正解: ${q.type === 'drag' ? q.answer.join(" ") : q.answer}`, { font: 'bold 18px monospace', fill: '#0000ff', wordWrap: { width: 760 }, align: 'center' }).setOrigin(0.5);
-    currentExpContainer.add([qText, aText]);
+    // 🛠 基準を左揃え(0, 0.5)にし、枠の左端（-380px）から折り返し幅760pxで絶対に収まるよう再計算
+    let qText = this.add.text(-380, -110, `問題: ${q.instruction.replace('【単語】','').replace('【熟語・表現】','')}`, { 
+        font: 'bold 15px monospace', fill: '#000000', wordWrap: { width: 760 }, align: 'left', lineSpacing: 4
+    }).setOrigin(0, 0.5);
     
-    // ⭕ 解説テキストの幅調整（枠からはみ出さないように wordWrap をしっかり設定）
-    let expTxt = this.add.text(0, 40, `【解説】\n${q.explanation}`, { font: '16px monospace', fill: '#333333', align: 'center', wordWrap: { width: 760 } }).setOrigin(0.5);
-    currentExpContainer.add(expTxt);
+    let aText = this.add.text(-380, -40, `正解: ${q.type === 'drag' ? q.answer.join(" ") : q.answer}`, { 
+        font: 'bold 18px monospace', fill: '#0000ff', wordWrap: { width: 760 }, align: 'left'
+    }).setOrigin(0, 0.5);
+    
+    let expTxt = this.add.text(-380, 50, `【解説】\n${q.explanation}`, { 
+        font: '15px monospace', fill: '#333333', wordWrap: { width: 760 }, align: 'left', lineSpacing: 4
+    }).setOrigin(0, 0.5);
+    
+    currentExpContainer.add([qText, aText, expTxt]);
     
     if (isCorrect) {
-        let nextBtn = this.add.text(0, 160, "NEXT (Enter / タップ) ▶", { font: 'bold 16px "Press Start 2P"', fill: '#ffffff', backgroundColor: '#222222', padding: 10 }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        let nextBtn = this.add.text(0, 175, "NEXT (Enter / タップ) ▶", { font: 'bold 16px "Press Start 2P"', fill: '#ffffff', backgroundColor: '#222222', padding: 10 }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         currentExpContainer.add(nextBtn);
         
         const proceedToNext = () => { 
@@ -913,8 +919,8 @@ function showExplanation(isCorrect) {
         nextBtn.on('pointerdown', proceedToNext);
         onNextCallback = proceedToNext; 
     } else {
-        let retryBtn = this.add.text(-130, 160, "↺ RETRY (もう一度)", { font: 'bold 16px "Press Start 2P"', fill: '#ffffff', backgroundColor: '#0055ff', padding: 10 }).setOrigin(0.5).setInteractive({ useHandCursor: true });
-        let nextBtn = this.add.text(130, 160, "NEXT (次へ) ▶", { font: 'bold 16px "Press Start 2P"', fill: '#ffffff', backgroundColor: '#222222', padding: 10 }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        let retryBtn = this.add.text(-140, 175, "↺ RETRY (もう一度)", { font: 'bold 15px "Press Start 2P"', fill: '#ffffff', backgroundColor: '#0055ff', padding: 10 }).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        let nextBtn = this.add.text(140, 175, "NEXT (次へ) ▶", { font: 'bold 15px "Press Start 2P"', fill: '#ffffff', backgroundColor: '#222222', padding: 10 }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         currentExpContainer.add([retryBtn, nextBtn]);
         
         const proceedToRetry = () => {
