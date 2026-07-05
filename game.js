@@ -19,7 +19,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-// 🔗 スプレッドシートの送信先URL
+// 🔗 スプレッドシートの送信先URL（http〜 から始まるこのURLで間違いありません）
 const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxgNghXggq3-SR55S5Aki9RBi_5eXSORGebfdVwRbbimRKwa9duFQ8FnyMrJ_km5Q4S/exec";
 
 let studentInfo = { grade: 1, class: 'A', number: 1, name: '' };
@@ -33,13 +33,13 @@ let wordBlocks = [];
 const quizData = [
     // === STAGE 1: 単語部門 (10問) ===
     { id: 1,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "queen"（beauty queen）の、この曲の文脈における正しい意味はどれ？', choices: ['本物の女王（王室の女性）', 'トランプの「Q」のカード', '（ミスコンなどの）女王、美女', '母親、年上の女性'], answer: '（ミスコンなどの）女王、美女', explanation: 'スライド4に登場する "beauty queen" は「（映画 of ワンシーンに出てくるような）美女」を意味する単語です。' },
-    { id: 2,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "scene"（movie scene）の正しい意味はどれ？', choices: ['（映画などの）シーン、場面', 'カメラのレンズ', '映画館の座席', 'セリフ、台本'], answer: '（映画などの）シーン、場面', explanation: 'スライド4の語彙タグ通り、"movie scene" で「映画のワンシーン（場面環境）」という意味になります。' },
+    { id: 2,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "scene"（movie scene）の正しい意味はどれ？', choices: ['（映画などの）シーン、場面', 'カメラのレンズ', '映画館の座席', 'セリフ、台本'], answer: '（映画などの）シーン、場面', explanation: 'スライド4の語彙タグ通り、"movie scene" で「映画のワンシーン（場面環境環境）」という意味になります。' },
     { id: 3,  stage: 1, type: 'choice', audioKey: 'music11', instruction: '【単語】歌詞に出てくる動詞 "claim"（She\'s just a girl who claims...）の正しい意味はどれ？', choices: ['～を優しく褒める', '（根拠がないのに）～だと主張する、言い張る', '静かに諦める', '友達に紹介する'], answer: '（根拠がないのに）～だと主張する、言い張る', explanation: 'スライド14の語彙タグに「claim：〜だと主張する、言い張る」と記載されており、根拠のない主張というニュアンスが含まれます。' },
     { id: 4,  stage: 1, type: 'choice', audioKey: 'music10', instruction: '【単語】歌詞に出てくる "lover"（Billie Jean is not my lover）の正しい意味はどれ？', choices: ['親友', 'ファン', '恋人', '仕事のパートナー'], answer: '恋人', explanation: 'スライド13に記載の通り、"lover" は「恋人」を意味し、マイケルが彼女との交際関係を否定している重要な単語です。' },
     { id: 5,  stage: 1, type: 'choice', audioKey: 'music12', instruction: '【単語】スライド15の解説にある、一般的な「子供」を指す客観的な単語はどれ？', choices: ['son', 'kid', 'girl', 'baby'], answer: 'kid', explanation: 'スライド15に「Kidは一般的な『子供』という客観的な言葉」と解説されています。' },
     { id: 6,  stage: 1, type: 'choice', audioKey: 'music12', instruction: '【単語】スライド15の解説にある、血縁関係を表す「自分の息子」という意味の強い単語はどれ？', choices: ['kid', 'son', 'boy', 'friend'], answer: 'son', explanation: 'スライド15に「Sonは『自分の息子』という血縁を表す強い言葉」と解説されています。' },
     { id: 7,  stage: 1, type: 'choice', audioKey: 'music9',  instruction: '【単語】歌詞に出てくる "lie"（\'Cause the lie becomes the truth）の正しい意味はどれ？', choices: ['嘘（うそ）', '秘密', '噂（うわさ）', '約束'], answer: '嘘（うそ）', explanation: 'スライド12の語彙タグにある通り、"lie" は「嘘」を意味する名詞です。' },
-    { id: 8,  stage: 1, type: 'choice', audioKey: 'music9',  instruction: '【単語】歌詞に出てくる "truth"（\'Cause the lie becomes the truth）の正しい意味はどれ？', choices: ['言い訳', '真真実、事実', '過去', '未来'], answer: '真実、事実', explanation: 'スライド12の語彙タグにある通り、"truth" は「真実、事実」を意味する名詞です。' },
+    { id: 8,  stage: 1, type: 'choice', audioKey: 'music9',  instruction: '【単語】歌詞に出てくる "truth"（\'Cause the lie becomes the truth）の正しい意味はどれ？', choices: ['言い訳', '真実、事実', '過去', '未来'], answer: '真実、事実', explanation: 'スライド12の語彙タグにある通り、"truth" は「真実、事実」を意味する名詞です。' },
     { id: 9,  stage: 1, type: 'choice', audioKey: 'music6',  instruction: '【単語】歌詞の "Be careful of what you do" に出てくる "careful" の正しい意味はどれ？', choices: ['注意深い、気をつける', '楽しそうな、陽気な', '怒りっぽい、不機嫌な', '退屈な、つまらない'], answer: '注意深い、気をつける', explanation: 'スライド9の解説の通り、"careful" は「注意深い、気をつける」という意味の形容詞です。' },
     { id: 10, stage: 1, type: 'choice', audioKey: 'music7',  instruction: '【単語】歌詞に出てくる "heart"（breakin\' young girls\' hearts）の、この文脈における正しい意味（比喩）はどれ？', choices: ['心臓、脈拍', '心、気持ち、愛情', '体調、健康', '記憶、思い出'], answer: '心、気持ち、愛情', explanation: 'スライド10に登場する "heart" は、単なる心臓ではなく、女の子たちの「心・気持ち」を指しています。' },
 
@@ -92,17 +92,14 @@ let buzzMonster;
 let buzzTween; 
 let extraBuzzGroup; 
 
-// 🔊 オーディオオブジェクト管理用変数
 let bgmSound = null;
 let currentActiveVoice = null;
 
 const blockColors = [0xFF3333, 0xFFCC00, 0x33CCFF, 0x9933FF]; 
 
-// 🎉 正解時のシャウト音声リスト
 const correctSoundsList = ['shout_howl', 'shout_dah', 'shout_aaow', 'shout_hee', 'shout_snore', 'shout_lose'];
 let correctSoundIndex = 0;
 
-// ❌ 不正解時の音声リスト（交代交代で再生する4つのサウンド）
 const wrongSoundsList = ['hahaha_zan', 'atatata', 'kuririn', 'your_blood'];
 let wrongSoundIndex = 0;
 
@@ -126,7 +123,6 @@ function preload() {
     this.load.image('buzz_mad1', 'assets/buzz-mad1.png');
     this.load.image('buzz_mad2', 'assets/buzz-mad2.png');
     
-    // 🎵 常時ループ再生用BGM
     this.load.audio('bgm_intro', 'sounds/uji-ueda.mp3');
 
     for(let i = 1; i <= 13; i++) {
@@ -139,7 +135,6 @@ function preload() {
     this.load.audio('shout_snore', 'sounds/snore.mp3');
     this.load.audio('shout_lose', 'sounds/lose-voice.mp3'); 
     
-    // ❌ 不正解時の音声群
     this.load.audio('hahaha_zan', 'sounds/hahaha-zan.mp3'); 
     this.load.audio('atatata', 'sounds/atatata.mp3'); 
     this.load.audio('kuririn', 'sounds/kuririn.mp3'); 
@@ -155,7 +150,6 @@ function create() {
     bg.setDisplaySize(1024, 768);
     extraBuzzGroup = this.add.group(); 
     
-    // 🎵 BGM初期化
     if (!bgmSound) {
         bgmSound = this.sound.add('bgm_intro', { loop: true, volume: 0.4 });
     }
@@ -375,19 +369,28 @@ function initGame() {
     let exitBtn = this.add.text(30, 35, '◀ EXIT', { font: 'bold 16px "Press Start 2P"', fill: '#ff3333', backgroundColor: '#222', padding: 10 })
         .setInteractive({ useHandCursor: true }).setDepth(10);
         
+    // 🛠 修正: EXITボタン内の非同期送信とシーン管理のバグを解消
     exitBtn.on('pointerdown', () => {
         if(confirm("ここまでのスコアをスプレッドシートに送信してタイトルに戻りますか？")) {
             if(timerEvent) timerEvent.remove();
             extraBuzzGroup.clear(true, true);
             
-            if(currentActiveVoice) { currentActiveVoice.stop(); currentActiveVoice = null; }
-            this.sound.stopAll();
-            bgmSound = null;
+            if(currentActiveVoice) { 
+                try { currentActiveVoice.stop(); } catch(e){} 
+                currentActiveVoice = null; 
+            }
             
             if (!isReviewMode) {
-                sendScoreToGAS(score, `途中終了 (第${currentQuestionIndex + 1}問でEXIT, Mode: ${currentSelectedMode})`, null);
+                // 送信処理（fetch）が終わるのを待ってからリスタートを実行（シーン強制遮断バグを回避）
+                sendScoreToGASAsync(score, `途中終了 (第${currentQuestionIndex + 1}問でEXIT, Mode: ${currentSelectedMode})`)
+                .then(() => {
+                    bgmSound = null;
+                    this.scene.restart();
+                });
+            } else {
+                bgmSound = null;
+                this.scene.restart();
             }
-            this.scene.restart();
         }
     });
 
@@ -885,7 +888,6 @@ function showExplanation(isCorrect) {
     let resultLabel = this.add.text(0, -170, isCorrect ? "⭕ CORRECT!" : "❌ WRONG...", { font: 'bold 28px "Press Start 2P"', fill: resColor }).setOrigin(0.5);
     currentExpContainer.add(resultLabel);
     
-    // 🛠 基準を左揃え(0, 0.5)にし、枠の左端（-380px）から折り返し幅760pxで絶対に収まるよう再計算
     let qText = this.add.text(-380, -110, `問題: ${q.instruction.replace('【単語】','').replace('【熟語・表現】','')}`, { 
         font: 'bold 15px monospace', fill: '#000000', wordWrap: { width: 760 }, align: 'left', lineSpacing: 4
     }).setOrigin(0, 0.5);
@@ -1010,8 +1012,7 @@ function showResultScreen() {
     }
     let restartBtn = this.add.text(0, 160, "◀ TOP MENU", { font: 'bold 18px "Press Start 2P"', fill: '#ffffff', backgroundColor: '#333333', padding: 12 }).setOrigin(0.5).setInteractive({ useHandCursor: true });
     resContainer.add(restartBtn); restartBtn.on('pointerdown', () => { 
-        if(currentActiveVoice) { currentActiveVoice.stop(); currentActiveVoice = null; }
-        this.sound.stopAll(); 
+        if(currentActiveVoice) { try { currentActiveVoice.stop(); } catch(e){} currentActiveVoice = null; }
         bgmSound = null;
         this.scene.restart(); 
     });
@@ -1025,4 +1026,15 @@ function sendScoreToGAS(targetScore, note = "", textComponent = null) {
     })
     .then(() => { if(textComponent) textComponent.setText("✅ スプレッドシートへデータを同期しました！"); })
     .catch((error) => { console.error("GAS Error:", error); if(textComponent) textComponent.setText("❌ 同期失敗"); });
+}
+
+// 🛠 追加: EXITボタン用の非同期送信・完了同期関数
+function sendScoreToGASAsync(targetScore, note = "") {
+    if (!GAS_WEBAPP_URL) return Promise.resolve();
+    return fetch(GAS_WEBAPP_URL, {
+        method: "POST", mode: "no-cors", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ grade: studentInfo.grade, class: studentInfo.class, number: studentInfo.number, name: studentInfo.name, playCount: playCount, score: Math.round(targetScore), note: note })
+    })
+    .then(() => new Promise(resolve => setTimeout(resolve, 500))) // 通信の取りこぼしを防ぐため少しウェイト
+    .catch((err) => { console.error(err); });
 }
