@@ -20,7 +20,7 @@ const config = {
 const game = new Phaser.Game(config);
 
 // 🔗 スプレッドシートの送信先URL
-const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxFuDr_Q4pLHg-ywJOipHcgTKgm5m072Jbw8LtsWldjphlLvebIrYPdv2MeHy2how6v/exec";
+const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxgNghXggq3-SR55S5Aki9RBi_5eXSORGebfdVwRbbimRKwa9duFQ8FnyMrJ_km5Q4S/exec";
 
 let studentInfo = { grade: 1, class: 'A', number: 1, name: '' };
 let playCount = 0; 
