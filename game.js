@@ -19,7 +19,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-// 🔗 スプレッドシートの送信先URL
+// 🔗 スプレッドシートの送信先URL（更新済み）
 const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxgNghXggq3-SR55S5Aki9RBi_5eXSORGebfdVwRbbimRKwa9duFQ8FnyMrJ_km5Q4S/exec";
 
 let studentInfo = { grade: 1, class: 'A', number: 1, name: '' };
@@ -33,7 +33,7 @@ let wordBlocks = [];
 const quizData = [
     // === STAGE 1: 単語部門 (10問) ===
     { id: 1,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "queen"（beauty queen）の、この曲の文脈における正しい意味はどれ？', choices: ['本物の女王（王室の女性）', 'トランプの「Q」のカード', '（ミスコンなどの）女王、美女', '母親、年上の女性'], answer: '（ミスコンなどの）女王、美女', explanation: 'スライド4に登場する "beauty queen" は「（映画のワンシーンに出てくるような）美女」を意味する単語です。' },
-    { id: 2,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "scene"（movie scene）の正しい意味はどれ？', choices: ['（映画などの）シーン、場面', 'カメラのレンズ', '映画館の座席', 'セリフ、台本'], answer: '（映画などの）シーン、場面', explanation: 'スライド4の語彙タグ通り、"movie scene" で「映画のワンシーン（場面環境）」という意味になります。' },
+    { id: 2,  stage: 1, type: 'choice', audioKey: 'music1',  instruction: '【単語】歌詞に出てくる "scene"（movie scene）の正しい意味はどれ？', choices: ['（映画などの）シーン、場面', 'カメラのレンズ', '映画館 of 座席', 'セリフ、台本'], answer: '（映画などの）シーン、場面', explanation: 'スライド4の語彙タグ通り、"movie scene" で「映画のワンシーン（場面環境）」という意味になります。' },
     { id: 3,  stage: 1, type: 'choice', audioKey: 'music11', instruction: '【単語】歌詞に出てくる動詞 "claim"（She\'s just a girl who claims...）の正しい意味はどれ？', choices: ['～を優しく褒める', '（根拠がないのに）～だと主張する、言い張る', '静かに諦める', '友達に紹介する'], answer: '（根拠がないのに）～だと主張する、言い張る', explanation: 'スライド14の語彙タグに「claim：〜だと主張する、言い張る」と記載されており、根拠のない主張というニュアンスが含まれます。' },
     { id: 4,  stage: 1, type: 'choice', audioKey: 'music10', instruction: '【単語】歌詞に出てくる "lover"（Billie Jean is not my lover）の正しい意味はどれ？', choices: ['親友', 'ファン', '恋人', '仕事のパートナー'], answer: '恋人', explanation: 'スライド13に記載の通り、"lover" は「恋人」を意味し、マイケルが彼女との交際関係を否定している重要な単語です。' },
     { id: 5,  stage: 1, type: 'choice', audioKey: 'music12', instruction: '【単語】スライド15の解説にある、一般的な「子供」を指す客観的な単語はどれ？', choices: ['son', 'kid', 'girl', 'baby'], answer: 'kid', explanation: 'スライド15に「Kidは一般的な『子供』という客観的な言葉」と解説されています。' },
@@ -586,7 +586,6 @@ function createChoiceUI(q) {
         btnGraphics.fillStyle(blockColors[idx % blockColors.length], 1).lineStyle(2, 0xffffff, 1);
         btnGraphics.fillRoundedRect(512 - 400, btnY - 28, 800, 56, 8).strokeRoundedRect(512 - 400, btnY - 28, 800, 56, 8);
         
-        // ⭕ 文字の削れ防止（metrics）を追加し、位置を +2 下げ、Depthを12に設定
         let choiceTxt = this.add.text(512, btnY + 2, `${idx + 1}. ${choice}`, { 
             font: 'bold 16px "Courier New", monospace', 
             fill: '#ffffff', 
@@ -886,10 +885,12 @@ function showExplanation(isCorrect) {
     let resultLabel = this.add.text(0, -170, isCorrect ? "⭕ CORRECT!" : "❌ WRONG...", { font: 'bold 28px "Press Start 2P"', fill: resColor }).setOrigin(0.5);
     currentExpContainer.add(resultLabel);
     
+    // ⭕ 問題文テキストの幅調整（枠からはみ出さないようにラップ幅を760に設定）
     let qText = this.add.text(0, -110, `問題: ${q.instruction.replace('【単語】','').replace('【熟語・表現】','')}`, { font: 'bold 15px monospace', fill: '#000000', wordWrap: { width: 760 }, align: 'center' }).setOrigin(0.5);
     let aText = this.add.text(0, -40, `正解: ${q.type === 'drag' ? q.answer.join(" ") : q.answer}`, { font: 'bold 18px monospace', fill: '#0000ff', wordWrap: { width: 760 }, align: 'center' }).setOrigin(0.5);
     currentExpContainer.add([qText, aText]);
     
+    // ⭕ 解説テキストの幅調整（枠からはみ出さないように wordWrap をしっかり設定）
     let expTxt = this.add.text(0, 40, `【解説】\n${q.explanation}`, { font: '16px monospace', fill: '#333333', align: 'center', wordWrap: { width: 760 } }).setOrigin(0.5);
     currentExpContainer.add(expTxt);
     
