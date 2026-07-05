@@ -19,7 +19,7 @@ const config = {
 
 const game = new Phaser.Game(config);
 
-// 🔗 スプレッドシートの送信先URL（http〜 から始まるこのURLで間違いありません）
+// 🔗 スプレッドシートの送信先URL
 const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxgNghXggq3-SR55S5Aki9RBi_5eXSORGebfdVwRbbimRKwa9duFQ8FnyMrJ_km5Q4S/exec";
 
 let studentInfo = { grade: 1, class: 'A', number: 1, name: '' };
@@ -559,7 +559,7 @@ function handleCorrectAnswer(q) {
         buzzMonster.setDepth(100); 
 
         this.tweens.add({
-            targets: buzzMonster,
+            targets: [buzzMonster],
             x: 512,
             y: 384,
             displayWidth: 1100,
@@ -894,17 +894,17 @@ function showExplanation(isCorrect) {
         font: 'bold 18px monospace', fill: '#0000ff', wordWrap: { width: 760 }, align: 'left'
     }).setOrigin(0, 0.5);
     
-    // === 🛠【修正】解説テキストのはみ出し・改行バグを徹底ガード ===
+    // === 🛠【修正】解説テキストのはみ出し・日本語自動折り返しガード ===
     let expTxt = this.add.text(-380, -10, `【解説】\n${q.explanation}`, { 
         font: 'bold 16px "Courier New", monospace', 
         fill: '#333333', 
         align: 'left', 
         lineSpacing: 8,
         wordWrap: { 
-            width: 760,            // 枠内に綺麗に収める幅
-            useAdvancedWrap: true  // 👈 日本語の改行をブラウザ不問で強制発動
+            width: 760,            // 白枠の横幅に綺麗に収める設定
+            useAdvancedWrap: true  // 💡 日本語（全角文字）の強制自動改行
         }
-    }).setOrigin(0, 0); // 👈 起点を左上に固定し、縦長になっても破綻しない設計へ
+    }).setOrigin(0, 0); // 💡 起点を「左上」に固定し、2行・3行になっても文字の重なりや破綻を防ぐ
 
     currentExpContainer.add([qText, aText, expTxt]);
     
@@ -980,8 +980,13 @@ function showResultScreen() {
     let statusText = this.add.text(0, -40, "最終スコアをスプレッドシートへ送信中...", { font: '16px monospace', fill: '#00ffff' }).setOrigin(0.5);
     resContainer.add(statusText);
     
-    if (!isReviewMode) sendScoreToGAS(finalScore, `完全クリア (Mode: ${currentSelectedMode})`, statusText);
-    else statusText.setText("復習完了 (再送信なし)");
+    // === 🛠【改善】復習モードのクリア時もスプレッドシートに100点を送信する ===
+    if (!isReviewMode) {
+        sendScoreToGAS(finalScore, `完全クリア (Mode: ${currentSelectedMode})`, statusText);
+    } else {
+        // 💡 復習完了時、新スコア(100点等)と「復習完了クリア」のメモ付きでスプレッドシートに送信！
+        sendScoreToGAS(finalScore, `復習完了クリア (Mode: ${currentSelectedMode})`, statusText);
+    }
     
     if (finalScore >= 80) {
         if (bgmSound && bgmSound.isPlaying) bgmSound.pause();
@@ -1010,7 +1015,7 @@ function showResultScreen() {
         });
     }
 
-    if (wrongQuestions.length > 0) {
+    if (wrongQuestions.length > 0 && finalScore < 100) {
         let reviewBtn = this.add.text(0, 50, `間違えた ${wrongQuestions.length} 問を復習`, { font: 'bold 16px "Press Start 2P"', fill: '#ffffff', backgroundColor: '#ff9900', padding: 12 }).setOrigin(0.5).setInteractive({ useHandCursor: true });
         resContainer.add(reviewBtn); reviewBtn.on('pointerdown', () => {
             Phaser.Utils.Array.Shuffle(wrongQuestions); currentQuestionIndex = 0; score = 0; isReviewMode = true; timerText.setVisible(true); resContainer.destroy(); initGame.call(this);
