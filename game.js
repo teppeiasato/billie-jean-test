@@ -591,9 +591,9 @@ function createChoiceUI(q) {
         btnGraphics.fillStyle(blockColors[idx % blockColors.length], 1).lineStyle(2, 0xffffff, 1);
         btnGraphics.fillRoundedRect(512 - 400, btnY - 28, 800, 56, 8).strokeRoundedRect(512 - 400, btnY - 28, 800, 56, 8);
         
-        let choiceTxt = this.add.text(512, btnY + 8, `${idx + 1}. ${choice}`, { 
+        let choiceTxt = this.add.text(512, btnY, `${idx + 1}. ${choice}`, { 
     font: 'bold 16px "Courier New", monospace', fill: '#ffffff', wordWrap: { width: 760 }, align: 'center' 
-}).setOrigin(0.5);
+}).setOrigin(0.5).setDepth(12);
         
         let hitArea = this.add.zone(512, btnY, 800, 56).setInteractive({ useHandCursor: true });
         
