@@ -126,7 +126,7 @@ function preload() {
     this.load.image('buzz_mad1', 'assets/buzz-mad1.png');
     this.load.image('buzz_mad2', 'assets/buzz-mad2.png');
     
-    // 🎵 常時ループ再生用BGM（uji-ueda.mp3に変更）
+    // 🎵 常時ループ再生用BGM
     this.load.audio('bgm_intro', 'sounds/uji-ueda.mp3');
 
     for(let i = 1; i <= 13; i++) {
@@ -139,7 +139,7 @@ function preload() {
     this.load.audio('shout_snore', 'sounds/snore.mp3');
     this.load.audio('shout_lose', 'sounds/lose-voice.mp3'); 
     
-    // ❌ 不正解時の新音声群
+    // ❌ 不正解時の音声群
     this.load.audio('hahaha_zan', 'sounds/hahaha-zan.mp3'); 
     this.load.audio('atatata', 'sounds/atatata.mp3'); 
     this.load.audio('kuririn', 'sounds/kuririn.mp3'); 
@@ -475,7 +475,6 @@ function updateTimer() {
     }
 }
 
-// ❌ 不正解の時の演出（音声を交代交代で再生 / 表情をmadとcryに変更）
 function triggerDamageEffect() {
     if (currentQuestionState === "DAMAGE" || currentQuestionState === "EXPLANATION") return; 
     currentQuestionState = "DAMAGE";
@@ -486,18 +485,16 @@ function triggerDamageEffect() {
     if (bgmSound && bgmSound.isPlaying) bgmSound.pause();
     if (currentActiveVoice && currentActiveVoice.isPlaying) { currentActiveVoice.stop(); currentActiveVoice = null; }
     
-    // 🔊 交代交代でボイスを再生
-    let wrongSoundKey = wrongSoundsList[wrongSoundsIndex];
+    let wrongSoundKey = wrongSoundsList[wrongSoundIndex];
     this.sound.play(wrongSoundKey); 
-    wrongSoundsIndex = (wrongSoundsIndex + 1) % wrongSoundsList.length; // 次のためにインデックスを1進める
+    wrongSoundIndex = (wrongSoundIndex + 1) % wrongSoundsList.length; 
 
     this.cameras.main.flash(200, 255, 0, 0, 0.5);
 
     if (buzzMonster) {
         this.tweens.killTweensOf(buzzMonster);
         
-        // 👾 不正解の時は buzz_mad と buzz_cry を交互に切り替え
-        let wrongFace = (wrongSoundsIndex % 2 === 0) ? 'buzz_mad' : 'buzz_cry';
+        let wrongFace = (wrongSoundIndex % 2 === 0) ? 'buzz_mad' : 'buzz_cry';
         startBuzzFlapping.call(this, buzzMonster, wrongFace);
         buzzMonster.setDepth(100); 
 
@@ -521,7 +518,6 @@ function triggerDamageEffect() {
     }
 }
 
-// 🎉 正解の時の演出（表情をbuzz-happyに変更）
 function handleCorrectAnswer(q) {
     if (currentQuestionState !== "PLAYING") return;
     currentQuestionState = "CORRECT";
@@ -558,7 +554,6 @@ function handleCorrectAnswer(q) {
     if (buzzMonster) {
         this.tweens.killTweensOf(buzzMonster);
         
-        // 👾 正解した時は表情を buzz_happy に変更
         startBuzzFlapping.call(this, buzzMonster, 'buzz_happy');
         buzzMonster.setDepth(100); 
 
@@ -591,13 +586,14 @@ function createChoiceUI(q) {
         btnGraphics.fillStyle(blockColors[idx % blockColors.length], 1).lineStyle(2, 0xffffff, 1);
         btnGraphics.fillRoundedRect(512 - 400, btnY - 28, 800, 56, 8).strokeRoundedRect(512 - 400, btnY - 28, 800, 56, 8);
         
+        // ⭕ 文字の削れ防止（metrics）を追加し、位置を +2 下げ、Depthを12に設定
         let choiceTxt = this.add.text(512, btnY + 2, `${idx + 1}. ${choice}`, { 
-    font: 'bold 16px "Courier New", monospace', 
-    fill: '#ffffff', 
-    wordWrap: { width: 760 }, 
-    align: 'center',
-    metrics: { fontSize: 24, ascent: 20, descent: 4 } // 💡 文字の上下の削れを強制防止する設定
-}).setOrigin(0.5).setDepth(12);
+            font: 'bold 16px "Courier New", monospace', 
+            fill: '#ffffff', 
+            wordWrap: { width: 760 }, 
+            align: 'center',
+            metrics: { fontSize: 24, ascent: 20, descent: 4 }
+        }).setOrigin(0.5).setDepth(12);
         
         let hitArea = this.add.zone(512, btnY, 800, 56).setInteractive({ useHandCursor: true });
         
